@@ -162,8 +162,9 @@ library Checkpoints {
         uint256 low,
         uint256 high
     ) private view returns (uint256) {
+        uint256 mid;
         while (low < high) {
-            uint256 mid = Math.average(low, high);
+            mid = Math.average(low, high);
             if (_unsafeAccess(self, mid)._blockNumber > key) {
                 high = mid;
             } else {
@@ -185,8 +186,9 @@ library Checkpoints {
         uint256 low,
         uint256 high
     ) private view returns (uint256) {
+        uint256 mid;
         while (low < high) {
-            uint256 mid = Math.average(low, high);
+            mid = Math.average(low, high);
             if (_unsafeAccess(self, mid)._blockNumber < key) {
                 low = mid + 1;
             } else {
@@ -335,8 +337,9 @@ library Checkpoints {
         uint256 low,
         uint256 high
     ) private view returns (uint256) {
+        uint256 mid;
         while (low < high) {
-            uint256 mid = Math.average(low, high);
+            mid = Math.average(low, high);
             if (_unsafeAccess(self, mid)._key > key) {
                 high = mid;
             } else {
@@ -358,8 +361,9 @@ library Checkpoints {
         uint256 low,
         uint256 high
     ) private view returns (uint256) {
+        uint256 mid;
         while (low < high) {
-            uint256 mid = Math.average(low, high);
+            mid = Math.average(low, high);
             if (_unsafeAccess(self, mid)._key < key) {
                 low = mid + 1;
             } else {
@@ -511,8 +515,9 @@ library Checkpoints {
         uint256 low,
         uint256 high
     ) private view returns (uint256) {
+        uint256 mid;
         while (low < high) {
-            uint256 mid = Math.average(low, high);
+            mid = Math.average(low, high);
             if (_unsafeAccess(self, mid)._key > key) {
                 high = mid;
             } else {
@@ -534,8 +539,9 @@ library Checkpoints {
         uint256 low,
         uint256 high
     ) private view returns (uint256) {
+        uint256 mid;
         while (low < high) {
-            uint256 mid = Math.average(low, high);
+            mid = Math.average(low, high);
             if (_unsafeAccess(self, mid)._key < key) {
                 low = mid + 1;
             } else {

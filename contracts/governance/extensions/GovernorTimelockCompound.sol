@@ -102,11 +102,13 @@ abstract contract GovernorTimelockCompound is IGovernorTimelock, Governor {
         uint256 eta = block.timestamp + _timelock.delay();
         _proposalTimelocks[proposalId] = eta;
 
-        for (uint256 i = 0; i < targets.length; ++i) {
-            if (_timelock.queuedTransactions(keccak256(abi.encode(targets[i], values[i], "", calldatas[i], eta)))) {
-                revert GovernorAlreadyQueuedProposal(proposalId);
+        unchecked {
+            for (uint256 i = 0; i < targets.length; ++i) {
+                if (_timelock.queuedTransactions(keccak256(abi.encode(targets[i], values[i], "", calldatas[i], eta)))) {
+                    revert GovernorAlreadyQueuedProposal(proposalId);
+                }
+                _timelock.queueTransaction(targets[i], values[i], "", calldatas[i], eta);
             }
-            _timelock.queueTransaction(targets[i], values[i], "", calldatas[i], eta);
         }
 
         emit ProposalQueued(proposalId, eta);
@@ -129,8 +131,10 @@ abstract contract GovernorTimelockCompound is IGovernorTimelock, Governor {
             revert GovernorNotQueuedProposal(proposalId);
         }
         Address.sendValue(payable(_timelock), msg.value);
-        for (uint256 i = 0; i < targets.length; ++i) {
-            _timelock.executeTransaction(targets[i], values[i], "", calldatas[i], eta);
+        unchecked {
+            for (uint256 i = 0; i < targets.length; ++i) {
+                _timelock.executeTransaction(targets[i], values[i], "", calldatas[i], eta);
+            }
         }
     }
 
@@ -151,8 +155,10 @@ abstract contract GovernorTimelockCompound is IGovernorTimelock, Governor {
             // update state first
             delete _proposalTimelocks[proposalId];
             // do external call later
-            for (uint256 i = 0; i < targets.length; ++i) {
-                _timelock.cancelTransaction(targets[i], values[i], "", calldatas[i], eta);
+            unchecked {
+                for (uint256 i = 0; i < targets.length; ++i) {
+                    _timelock.cancelTransaction(targets[i], values[i], "", calldatas[i], eta);
+                }
             }
         }
 

@@ -120,14 +120,18 @@ contract TimelockController is AccessControl, ERC721Holder, ERC1155Holder {
         }
 
         // register proposers and cancellers
-        for (uint256 i = 0; i < proposers.length; ++i) {
-            _grantRole(PROPOSER_ROLE, proposers[i]);
-            _grantRole(CANCELLER_ROLE, proposers[i]);
+        unchecked {
+            for (uint256 i = 0; i < proposers.length; ++i) {
+                _grantRole(PROPOSER_ROLE, proposers[i]);
+                _grantRole(CANCELLER_ROLE, proposers[i]);
+            }
         }
 
         // register executors
-        for (uint256 i = 0; i < executors.length; ++i) {
-            _grantRole(EXECUTOR_ROLE, executors[i]);
+        unchecked {
+            for (uint256 i = 0; i < executors.length; ++i) {
+                _grantRole(EXECUTOR_ROLE, executors[i]);
+            }
         }
 
         _minDelay = minDelay;
@@ -284,8 +288,10 @@ contract TimelockController is AccessControl, ERC721Holder, ERC1155Holder {
 
         bytes32 id = hashOperationBatch(targets, values, payloads, predecessor, salt);
         _schedule(id, delay);
-        for (uint256 i = 0; i < targets.length; ++i) {
-            emit CallScheduled(id, i, targets[i], values[i], payloads[i], predecessor, delay);
+        unchecked {
+            for (uint256 i = 0; i < targets.length; ++i) {
+                emit CallScheduled(id, i, targets[i], values[i], payloads[i], predecessor, delay);
+            }
         }
         if (salt != bytes32(0)) {
             emit CallSalt(id, salt);
@@ -375,12 +381,14 @@ contract TimelockController is AccessControl, ERC721Holder, ERC1155Holder {
         bytes32 id = hashOperationBatch(targets, values, payloads, predecessor, salt);
 
         _beforeCall(id, predecessor);
-        for (uint256 i = 0; i < targets.length; ++i) {
-            address target = targets[i];
-            uint256 value = values[i];
-            bytes calldata payload = payloads[i];
-            _execute(target, value, payload);
-            emit CallExecuted(id, i, target, value, payload);
+        unchecked {
+            for (uint256 i = 0; i < targets.length; ++i) {
+                address target = targets[i];
+                uint256 value = values[i];
+                bytes calldata payload = payloads[i];
+                _execute(target, value, payload);
+                emit CallExecuted(id, i, target, value, payload);
+            }
         }
         _afterCall(id);
     }

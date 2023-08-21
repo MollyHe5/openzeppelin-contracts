@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: MIT
 // OpenZeppelin Contracts (last updated v4.9.0) (governance/utils/Votes.sol)
-pragma solidity ^0.8.19;
+pragma solidity ^0.8.20;
 
 import {IERC5805} from "../../interfaces/IERC5805.sol";
 import {Context} from "../../utils/Context.sol";
@@ -34,9 +34,9 @@ abstract contract Votes is Context, EIP712, Nonces, IERC5805 {
     bytes32 private constant _DELEGATION_TYPEHASH =
         keccak256("Delegation(address delegatee,uint256 nonce,uint256 expiry)");
 
-    mapping(address => address) private _delegation;
+    mapping(address account => address) private _delegatee;
 
-    mapping(address => Checkpoints.Trace224) private _delegateCheckpoints;
+    mapping(address delegatee => Checkpoints.Trace224) private _delegateCheckpoints;
 
     Checkpoints.Trace224 private _totalCheckpoints;
 
@@ -124,7 +124,7 @@ abstract contract Votes is Context, EIP712, Nonces, IERC5805 {
      * @dev Returns the delegate that `account` has chosen.
      */
     function delegates(address account) public view virtual returns (address) {
-        return _delegation[account];
+        return _delegatee[account];
     }
 
     /**
@@ -166,7 +166,7 @@ abstract contract Votes is Context, EIP712, Nonces, IERC5805 {
      */
     function _delegate(address account, address delegatee) internal virtual {
         address oldDelegate = delegates(account);
-        _delegation[account] = delegatee;
+        _delegatee[account] = delegatee;
 
         emit DelegateChanged(account, oldDelegate, delegatee);
         _moveDelegateVotes(oldDelegate, delegatee, _getVotingUnits(account));

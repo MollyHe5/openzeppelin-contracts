@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: MIT
 // OpenZeppelin Contracts (last updated v4.9.0) (utils/Arrays.sol)
 
-pragma solidity ^0.8.19;
+pragma solidity ^0.8.20;
 
 import {StorageSlot} from "./StorageSlot.sol";
 import {Math} from "./math/Math.sol";
@@ -33,7 +33,7 @@ library Arrays {
             uint256 mid = Math.average(low, high);
 
             // Note that mid will always be strictly less than high (i.e. it will be a valid array index)
-            // because Math.average rounds down (it does integer division with truncation).
+            // because Math.average rounds towards zero (it does integer division with truncation).
             if (unsafeAccess(array, mid).value > element) {
                 high = mid;
             } else {
@@ -57,7 +57,7 @@ library Arrays {
     function unsafeAccess(address[] storage arr, uint256 pos) internal pure returns (StorageSlot.AddressSlot storage) {
         bytes32 slot;
         // We use assembly to calculate the storage slot of the element at index `pos` of the dynamic array `arr`
-        // following https://docs.soliditylang.org/en/v0.8.17/internals/layout_in_storage.html#mappings-and-dynamic-arrays.
+        // following https://docs.soliditylang.org/en/v0.8.20/internals/layout_in_storage.html#mappings-and-dynamic-arrays.
 
         /// @solidity memory-safe-assembly
         assembly {
@@ -75,7 +75,7 @@ library Arrays {
     function unsafeAccess(bytes32[] storage arr, uint256 pos) internal pure returns (StorageSlot.Bytes32Slot storage) {
         bytes32 slot;
         // We use assembly to calculate the storage slot of the element at index `pos` of the dynamic array `arr`
-        // following https://docs.soliditylang.org/en/v0.8.17/internals/layout_in_storage.html#mappings-and-dynamic-arrays.
+        // following https://docs.soliditylang.org/en/v0.8.20/internals/layout_in_storage.html#mappings-and-dynamic-arrays.
 
         /// @solidity memory-safe-assembly
         assembly {
@@ -93,7 +93,7 @@ library Arrays {
     function unsafeAccess(uint256[] storage arr, uint256 pos) internal pure returns (StorageSlot.Uint256Slot storage) {
         bytes32 slot;
         // We use assembly to calculate the storage slot of the element at index `pos` of the dynamic array `arr`
-        // following https://docs.soliditylang.org/en/v0.8.17/internals/layout_in_storage.html#mappings-and-dynamic-arrays.
+        // following https://docs.soliditylang.org/en/v0.8.20/internals/layout_in_storage.html#mappings-and-dynamic-arrays.
 
         /// @solidity memory-safe-assembly
         assembly {

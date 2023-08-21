@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: MIT
 // OpenZeppelin Contracts (last updated v4.9.0) (token/ERC721/IERC721.sol)
 
-pragma solidity ^0.8.19;
+pragma solidity ^0.8.20;
 
 import {IERC165} from "../../utils/introspection/IERC165.sol";
 
@@ -108,7 +108,7 @@ interface IERC721 is IERC165 {
      *
      * Requirements:
      *
-     * - The `operator` cannot be the caller.
+     * - The `operator` cannot be the address zero.
      *
      * Emits an {ApprovalForAll} event.
      */

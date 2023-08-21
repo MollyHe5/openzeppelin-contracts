@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: MIT
 // OpenZeppelin Contracts (last updated v4.7.0) (proxy/beacon/BeaconProxy.sol)
 
-pragma solidity ^0.8.19;
+pragma solidity ^0.8.20;
 
 import {IBeacon} from "./IBeacon.sol";
 import {Proxy} from "../Proxy.sol";
@@ -34,9 +34,10 @@ contract BeaconProxy is Proxy {
      * Requirements:
      *
      * - `beacon` must be a contract with the interface {IBeacon}.
+     * - If `data` is empty, `msg.value` must be zero.
      */
     constructor(address beacon, bytes memory data) payable {
-        ERC1967Utils.upgradeBeaconToAndCall(beacon, data, false);
+        ERC1967Utils.upgradeBeaconToAndCall(beacon, data);
         _beacon = beacon;
     }
 

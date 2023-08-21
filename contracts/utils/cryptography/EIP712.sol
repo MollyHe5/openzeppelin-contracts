@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: MIT
 // OpenZeppelin Contracts (last updated v4.9.0) (utils/cryptography/EIP712.sol)
 
-pragma solidity ^0.8.19;
+pragma solidity ^0.8.20;
 
 import {MessageHashUtils} from "./MessageHashUtils.sol";
 import {ShortStrings, ShortString} from "../ShortStrings.sol";
@@ -29,7 +29,7 @@ import {IERC5267} from "../../interfaces/IERC5267.sol";
  * separator of the implementation contract. This will cause the {_domainSeparatorV4} function to always rebuild the
  * separator from the immutable values, which is cheaper than accessing a cached version in cold storage.
  *
- * @custom:oz-upgrades-unsafe-allow state-variable-immutable state-variable-assignment
+ * @custom:oz-upgrades-unsafe-allow state-variable-immutable
  */
 abstract contract EIP712 is IERC5267 {
     using ShortStrings for *;

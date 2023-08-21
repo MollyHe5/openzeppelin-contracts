@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: MIT
 
-pragma solidity ^0.8.19;
+pragma solidity ^0.8.20;
 
 import {Strings} from "../Strings.sol";
 
@@ -21,7 +21,7 @@ library MessageHashUtils {
      * hash signed when using the https://eth.wiki/json-rpc/API#eth_sign[`eth_sign`] JSON-RPC method.
      *
      * NOTE: The `hash` parameter is intended to be the result of hashing a raw message with
-     * keccak256, althoguh any bytes32 value can be safely used because the final digest will
+     * keccak256, although any bytes32 value can be safely used because the final digest will
      * be re-hashed.
      *
      * See {ECDSA-recover}.
@@ -46,7 +46,8 @@ library MessageHashUtils {
      * See {ECDSA-recover}.
      */
     function toEthSignedMessageHash(bytes memory message) internal pure returns (bytes32 digest) {
-        return keccak256(abi.encodePacked("\x19Ethereum Signed Message:\n", Strings.toString(message.length), message));
+        return
+            keccak256(bytes.concat("\x19Ethereum Signed Message:\n", bytes(Strings.toString(message.length)), message));
     }
 
     /**

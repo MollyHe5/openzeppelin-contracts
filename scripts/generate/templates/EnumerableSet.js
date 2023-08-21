@@ -9,7 +9,7 @@ const TYPES = [
 
 /* eslint-disable max-len */
 const header = `\
-pragma solidity ^0.8.19;
+pragma solidity ^0.8.20;
 
 /**
  * @dev Library for managing
@@ -63,7 +63,7 @@ struct Set {
     bytes32[] _values;
     // Position of the value in the \`values\` array, plus 1 because index 0
     // means a value is not in the set.
-    mapping(bytes32 => uint256) _indexes;
+    mapping(bytes32 value => uint256) _indexes;
 }
 
 /**

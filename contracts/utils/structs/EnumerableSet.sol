@@ -2,7 +2,7 @@
 // OpenZeppelin Contracts (last updated v4.9.0) (utils/structs/EnumerableSet.sol)
 // This file was procedurally generated from scripts/generate/templates/EnumerableSet.js.
 
-pragma solidity ^0.8.19;
+pragma solidity ^0.8.20;
 
 /**
  * @dev Library for managing
@@ -53,7 +53,7 @@ library EnumerableSet {
         bytes32[] _values;
         // Position of the value in the `values` array, plus 1 because index 0
         // means a value is not in the set.
-        mapping(bytes32 => uint256) _indexes;
+        mapping(bytes32 value => uint256) _indexes;
     }
 
     /**

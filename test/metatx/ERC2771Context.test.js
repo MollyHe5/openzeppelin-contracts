@@ -1,6 +1,7 @@
 const ethSigUtil = require('eth-sig-util');
 const Wallet = require('ethereumjs-wallet').default;
 const { getDomain, domainType } = require('../helpers/eip712');
+const { MAX_UINT48 } = require('../helpers/constants');
 
 const { expectEvent } = require('@openzeppelin/test-helpers');
 const { expect } = require('chai');
@@ -12,7 +13,7 @@ const ContextMockCaller = artifacts.require('ContextMockCaller');
 const { shouldBehaveLikeRegularContext } = require('../utils/Context.behavior');
 
 contract('ERC2771Context', function (accounts) {
-  const MAX_UINT48 = web3.utils.toBN(1).shln(48).subn(1).toString();
+  const [, trustedForwarder] = accounts;
 
   beforeEach(async function () {
     this.forwarder = await ERC2771Forwarder.new('ERC2771Forwarder');
@@ -34,7 +35,11 @@ contract('ERC2771Context', function (accounts) {
   });
 
   it('recognize trusted forwarder', async function () {
-    expect(await this.recipient.isTrustedForwarder(this.forwarder.address));
+    expect(await this.recipient.isTrustedForwarder(this.forwarder.address)).to.equal(true);
+  });
+
+  it('returns the trusted forwarder', async function () {
+    expect(await this.recipient.trustedForwarder()).to.equal(this.forwarder.address);
   });
 
   context('when called directly', function () {
@@ -79,6 +84,15 @@ contract('ERC2771Context', function (accounts) {
         const { tx } = await this.forwarder.execute(req);
         await expectEvent.inTransaction(tx, ERC2771ContextMock, 'Sender', { sender: this.sender });
       });
+
+      it('returns the original sender when calldata length is less than 20 bytes (address length)', async function () {
+        // The forwarder doesn't produce calls with calldata length less than 20 bytes
+        const recipient = await ERC2771ContextMock.new(trustedForwarder);
+
+        const { receipt } = await recipient.msgSender({ from: trustedForwarder });
+
+        await expectEvent(receipt, 'Sender', { sender: trustedForwarder });
+      });
     });
 
     describe('msgData', function () {
@@ -105,6 +119,16 @@ contract('ERC2771Context', function (accounts) {
         const { tx } = await this.forwarder.execute(req);
         await expectEvent.inTransaction(tx, ERC2771ContextMock, 'Data', { data, integerValue, stringValue });
       });
+    });
+
+    it('returns the full original data when calldata length is less than 20 bytes (address length)', async function () {
+      // The forwarder doesn't produce calls with calldata length less than 20 bytes
+      const recipient = await ERC2771ContextMock.new(trustedForwarder);
+
+      const { receipt } = await recipient.msgDataShort({ from: trustedForwarder });
+
+      const data = recipient.contract.methods.msgDataShort().encodeABI();
+      await expectEvent(receipt, 'DataShort', { data });
     });
   });
 });

@@ -186,10 +186,11 @@ abstract contract ERC20Snapshot is ERC20 {
     }
 
     function _lastSnapshotId(uint256[] storage ids) private view returns (uint256) {
-        if (ids.length == 0) {
+        uint256 len = ids.length;
+        if (len == 0) {
             return 0;
         } else {
-            return ids[ids.length - 1];
+            return ids[len - 1];
         }
     }
 }

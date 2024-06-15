@@ -101,9 +101,10 @@ abstract contract GovernorCompatibilityBravo is IGovernorTimelock, IGovernorComp
 
     function cancel(uint256 proposalId) public virtual override {
         ProposalDetails storage details = _proposalDetails[proposalId];
+        address detailProposer = details.proposer;
 
         require(
-            _msgSender() == details.proposer || getVotes(details.proposer, block.number - 1) < proposalThreshold(),
+            _msgSender() == detailProposer || getVotes(detailProposer, block.number - 1) < proposalThreshold(),
             "GovernorBravo: proposer above threshold"
         );
 
@@ -124,11 +125,14 @@ abstract contract GovernorCompatibilityBravo is IGovernorTimelock, IGovernorComp
         returns (bytes[] memory)
     {
         bytes[] memory fullcalldatas = new bytes[](calldatas.length);
-
-        for (uint256 i = 0; i < signatures.length; ++i) {
+        uint256 len = signatures.length;
+        for (uint256 i = 0; i < len;) {
             fullcalldatas[i] = bytes(signatures[i]).length == 0
                 ? calldatas[i]
                 : abi.encodePacked(bytes4(keccak256(bytes(signatures[i]))), calldatas[i]);
+            unchecked {
+                ++i;
+            }
         }
 
         return fullcalldatas;

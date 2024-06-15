@@ -66,8 +66,12 @@ contract ERC777 is Context, IERC777, IERC20 {
         _symbol = symbol_;
 
         _defaultOperatorsArray = defaultOperators_;
-        for (uint256 i = 0; i < defaultOperators_.length; i++) {
+        uint256 len = defaultOperators_.length;
+        for (uint256 i = 0; i < len;) {
             _defaultOperators[defaultOperators_[i]] = true;
+            unchecked {
+                i++;
+            }
         }
 
         // register interfaces
@@ -130,7 +134,7 @@ contract ERC777 is Context, IERC777, IERC20 {
     function send(
         address recipient,
         uint256 amount,
-        bytes memory data
+        bytes calldata data
     ) public virtual override {
         _send(_msgSender(), recipient, amount, data, "", true);
     }
@@ -153,7 +157,7 @@ contract ERC777 is Context, IERC777, IERC20 {
      *
      * Also emits a {IERC20-Transfer} event for ERC20 compatibility.
      */
-    function burn(uint256 amount, bytes memory data) public virtual override {
+    function burn(uint256 amount, bytes calldata data) public virtual override {
         _burn(_msgSender(), amount, data, "");
     }
 
@@ -213,8 +217,8 @@ contract ERC777 is Context, IERC777, IERC20 {
         address sender,
         address recipient,
         uint256 amount,
-        bytes memory data,
-        bytes memory operatorData
+        bytes calldata data,
+        bytes calldata operatorData
     ) public virtual override {
         require(isOperatorFor(_msgSender(), sender), "ERC777: caller is not an operator for holder");
         _send(sender, recipient, amount, data, operatorData, true);
@@ -228,8 +232,8 @@ contract ERC777 is Context, IERC777, IERC20 {
     function operatorBurn(
         address account,
         uint256 amount,
-        bytes memory data,
-        bytes memory operatorData
+        bytes calldata data,
+        bytes calldata operatorData
     ) public virtual override {
         require(isOperatorFor(_msgSender(), account), "ERC777: caller is not an operator for holder");
         _burn(account, amount, data, operatorData);
@@ -343,7 +347,9 @@ contract ERC777 is Context, IERC777, IERC20 {
 
         // Update state variables
         _totalSupply += amount;
-        _balances[account] += amount;
+        unchecked {
+            _balances[account] += amount;
+        }
 
         _callTokensReceived(operator, address(0), account, amount, userData, operatorData, requireReceptionAck);
 
@@ -406,8 +412,8 @@ contract ERC777 is Context, IERC777, IERC20 {
         require(fromBalance >= amount, "ERC777: burn amount exceeds balance");
         unchecked {
             _balances[from] = fromBalance - amount;
+            _totalSupply -= amount;
         }
-        _totalSupply -= amount;
 
         emit Burned(operator, from, amount, data, operatorData);
         emit Transfer(from, address(0), amount);

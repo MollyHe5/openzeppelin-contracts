@@ -113,9 +113,10 @@ abstract contract ERC20Votes is IVotes, ERC20Permit {
 
         uint256 low = 0;
         uint256 high = length;
+        uint256 mid;
 
         if (length > 5) {
-            uint256 mid = length - Math.sqrt(length);
+            mid = length - Math.sqrt(length);
             if (_unsafeAccess(ckpts, mid).fromBlock > blockNumber) {
                 high = mid;
             } else {
@@ -124,7 +125,7 @@ abstract contract ERC20Votes is IVotes, ERC20Permit {
         }
 
         while (low < high) {
-            uint256 mid = Math.average(low, high);
+            mid = Math.average(low, high);
             if (_unsafeAccess(ckpts, mid).fromBlock > blockNumber) {
                 high = mid;
             } else {

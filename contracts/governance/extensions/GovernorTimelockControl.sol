@@ -134,8 +134,9 @@ abstract contract GovernorTimelockControl is IGovernorTimelock, Governor {
     ) internal virtual override returns (uint256) {
         uint256 proposalId = super._cancel(targets, values, calldatas, descriptionHash);
 
-        if (_timelockIds[proposalId] != 0) {
-            _timelock.cancel(_timelockIds[proposalId]);
+        bytes32 timelockId = _timelockIds[proposalId];
+        if (timelockId != 0) {
+            _timelock.cancel(timelockId);
             delete _timelockIds[proposalId];
         }
 

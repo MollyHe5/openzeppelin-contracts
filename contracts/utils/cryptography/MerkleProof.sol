@@ -55,8 +55,12 @@ library MerkleProof {
      */
     function processProof(bytes32[] memory proof, bytes32 leaf) internal pure returns (bytes32) {
         bytes32 computedHash = leaf;
-        for (uint256 i = 0; i < proof.length; i++) {
+        uint256 len = proof.length;
+        for (uint256 i = 0; i < len;) {
             computedHash = _hashPair(computedHash, proof[i]);
+            unchecked {
+                i++;
+            }
         }
         return computedHash;
     }
@@ -68,8 +72,12 @@ library MerkleProof {
      */
     function processProofCalldata(bytes32[] calldata proof, bytes32 leaf) internal pure returns (bytes32) {
         bytes32 computedHash = leaf;
-        for (uint256 i = 0; i < proof.length; i++) {
+        uint256 len = proof.length;
+        for (uint256 i = 0; i < len;) {
             computedHash = _hashPair(computedHash, proof[i]);
+            unchecked {
+                i++;
+            }
         }
         return computedHash;
     }
@@ -145,10 +153,13 @@ library MerkleProof {
         //   get the next hash.
         // - depending on the flag, either another value for the "main queue" (merging branches) or an element from the
         //   `proof` array.
-        for (uint256 i = 0; i < totalHashes; i++) {
+        for (uint256 i = 0; i < totalHashes;) {
             bytes32 a = leafPos < leavesLen ? leaves[leafPos++] : hashes[hashPos++];
             bytes32 b = proofFlags[i] ? leafPos < leavesLen ? leaves[leafPos++] : hashes[hashPos++] : proof[proofPos++];
             hashes[i] = _hashPair(a, b);
+            unchecked {
+                i++;
+            }
         }
 
         if (totalHashes > 0) {
@@ -193,10 +204,13 @@ library MerkleProof {
         //   get the next hash.
         // - depending on the flag, either another value for the "main queue" (merging branches) or an element from the
         //   `proof` array.
-        for (uint256 i = 0; i < totalHashes; i++) {
+        for (uint256 i = 0; i < totalHashes;) {
             bytes32 a = leafPos < leavesLen ? leaves[leafPos++] : hashes[hashPos++];
             bytes32 b = proofFlags[i] ? leafPos < leavesLen ? leaves[leafPos++] : hashes[hashPos++] : proof[proofPos++];
             hashes[i] = _hashPair(a, b);
+            unchecked {
+                i++;
+            }
         }
 
         if (totalHashes > 0) {

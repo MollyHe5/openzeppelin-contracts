@@ -100,12 +100,16 @@ abstract contract GovernorTimelockCompound is IGovernorTimelock, Governor {
 
         uint256 eta = block.timestamp + _timelock.delay();
         _proposalTimelocks[proposalId].timer.setDeadline(eta.toUint64());
-        for (uint256 i = 0; i < targets.length; ++i) {
+        uint256 len = targets.length;
+        for (uint256 i = 0; i < len;) {
             require(
                 !_timelock.queuedTransactions(keccak256(abi.encode(targets[i], values[i], "", calldatas[i], eta))),
                 "GovernorTimelockCompound: identical proposal action already queued"
             );
             _timelock.queueTransaction(targets[i], values[i], "", calldatas[i], eta);
+            unchecked {
+                ++i;
+            }
         }
 
         emit ProposalQueued(proposalId, eta);
@@ -126,8 +130,12 @@ abstract contract GovernorTimelockCompound is IGovernorTimelock, Governor {
         uint256 eta = proposalEta(proposalId);
         require(eta > 0, "GovernorTimelockCompound: proposal not yet queued");
         Address.sendValue(payable(_timelock), msg.value);
-        for (uint256 i = 0; i < targets.length; ++i) {
+        uint256 len = targets.length;
+        for (uint256 i = 0; i < len;) {
             _timelock.executeTransaction(targets[i], values[i], "", calldatas[i], eta);
+            unchecked {
+                ++i;
+            }
         }
     }
 
@@ -145,8 +153,12 @@ abstract contract GovernorTimelockCompound is IGovernorTimelock, Governor {
 
         uint256 eta = proposalEta(proposalId);
         if (eta > 0) {
-            for (uint256 i = 0; i < targets.length; ++i) {
+            uint256 len = targets.length;
+            for (uint256 i = 0; i < len;) {
                 _timelock.cancelTransaction(targets[i], values[i], "", calldatas[i], eta);
+                unchecked {
+                    ++i;
+                }
             }
             _proposalTimelocks[proposalId].timer.reset();
         }

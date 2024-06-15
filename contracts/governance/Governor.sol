@@ -321,9 +321,15 @@ abstract contract Governor is Context, ERC165, EIP712, IGovernor, IERC721Receive
         bytes32 /*descriptionHash*/
     ) internal virtual {
         string memory errorMessage = "Governor: call reverted without message";
-        for (uint256 i = 0; i < targets.length; ++i) {
-            (bool success, bytes memory returndata) = targets[i].call{value: values[i]}(calldatas[i]);
+        uint256 len = targets.length;
+        bool success;
+        bytes memory returndata;
+        for (uint256 i = 0; i < len;) {
+            (success, returndata) = targets[i].call{value: values[i]}(calldatas[i]);
             Address.verifyCallResult(success, returndata, errorMessage);
+            unchecked {
+                ++i;
+            }
         }
     }
 
@@ -338,9 +344,13 @@ abstract contract Governor is Context, ERC165, EIP712, IGovernor, IERC721Receive
         bytes32 /*descriptionHash*/
     ) internal virtual {
         if (_executor() != address(this)) {
-            for (uint256 i = 0; i < targets.length; ++i) {
+            uint256 len = targets.length;
+            for (uint256 i = 0; i < len;) {
                 if (targets[i] == address(this)) {
                     _governanceCall.pushBack(keccak256(calldatas[i]));
+                }
+                unchecked {
+                    ++i;
                 }
             }
         }
@@ -402,7 +412,7 @@ abstract contract Governor is Context, ERC165, EIP712, IGovernor, IERC721Receive
     function getVotesWithParams(
         address account,
         uint256 blockNumber,
-        bytes memory params
+        bytes calldata params
     ) public view virtual override returns (uint256) {
         return _getVotes(account, blockNumber, params);
     }
@@ -434,7 +444,7 @@ abstract contract Governor is Context, ERC165, EIP712, IGovernor, IERC721Receive
         uint256 proposalId,
         uint8 support,
         string calldata reason,
-        bytes memory params
+        bytes calldata params
     ) public virtual override returns (uint256) {
         address voter = _msgSender();
         return _castVote(proposalId, voter, support, reason, params);
@@ -466,7 +476,7 @@ abstract contract Governor is Context, ERC165, EIP712, IGovernor, IERC721Receive
         uint256 proposalId,
         uint8 support,
         string calldata reason,
-        bytes memory params,
+        bytes calldata params,
         uint8 v,
         bytes32 r,
         bytes32 s
@@ -564,7 +574,7 @@ abstract contract Governor is Context, ERC165, EIP712, IGovernor, IERC721Receive
         address,
         address,
         uint256,
-        bytes memory
+        bytes calldata
     ) public virtual override returns (bytes4) {
         return this.onERC721Received.selector;
     }
@@ -577,7 +587,7 @@ abstract contract Governor is Context, ERC165, EIP712, IGovernor, IERC721Receive
         address,
         uint256,
         uint256,
-        bytes memory
+        bytes calldata
     ) public virtual override returns (bytes4) {
         return this.onERC1155Received.selector;
     }
@@ -588,9 +598,9 @@ abstract contract Governor is Context, ERC165, EIP712, IGovernor, IERC721Receive
     function onERC1155BatchReceived(
         address,
         address,
-        uint256[] memory,
-        uint256[] memory,
-        bytes memory
+        uint256[] calldata,
+        uint256[] calldata,
+        bytes calldata
     ) public virtual override returns (bytes4) {
         return this.onERC1155BatchReceived.selector;
     }

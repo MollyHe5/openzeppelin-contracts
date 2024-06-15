@@ -79,19 +79,23 @@ contract ERC1155 is Context, ERC165, IERC1155, IERC1155MetadataURI {
      *
      * - `accounts` and `ids` must have the same length.
      */
-    function balanceOfBatch(address[] memory accounts, uint256[] memory ids)
+    function balanceOfBatch(address[] calldata accounts, uint256[] calldata ids)
         public
         view
         virtual
         override
         returns (uint256[] memory)
     {
-        require(accounts.length == ids.length, "ERC1155: accounts and ids length mismatch");
+        uint256 len = accounts.length;
+        require(len == ids.length, "ERC1155: accounts and ids length mismatch");
 
-        uint256[] memory batchBalances = new uint256[](accounts.length);
+        uint256[] memory batchBalances = new uint256[](len);
 
-        for (uint256 i = 0; i < accounts.length; ++i) {
+        for (uint256 i = 0; i < len;) {
             batchBalances[i] = balanceOf(accounts[i], ids[i]);
+            unchecked {
+                ++i;
+            }
         }
 
         return batchBalances;
@@ -119,7 +123,7 @@ contract ERC1155 is Context, ERC165, IERC1155, IERC1155MetadataURI {
         address to,
         uint256 id,
         uint256 amount,
-        bytes memory data
+        bytes calldata data
     ) public virtual override {
         require(
             from == _msgSender() || isApprovedForAll(from, _msgSender()),
@@ -134,9 +138,9 @@ contract ERC1155 is Context, ERC165, IERC1155, IERC1155MetadataURI {
     function safeBatchTransferFrom(
         address from,
         address to,
-        uint256[] memory ids,
-        uint256[] memory amounts,
-        bytes memory data
+        uint256[] calldata ids,
+        uint256[] calldata amounts,
+        bytes calldata data
     ) public virtual override {
         require(
             from == _msgSender() || isApprovedForAll(from, _msgSender()),
@@ -203,23 +207,30 @@ contract ERC1155 is Context, ERC165, IERC1155, IERC1155MetadataURI {
         uint256[] memory amounts,
         bytes memory data
     ) internal virtual {
-        require(ids.length == amounts.length, "ERC1155: ids and amounts length mismatch");
+        uint256 len = ids.length;
+        require(len == amounts.length, "ERC1155: ids and amounts length mismatch");
         require(to != address(0), "ERC1155: transfer to the zero address");
 
         address operator = _msgSender();
 
         _beforeTokenTransfer(operator, from, to, ids, amounts, data);
 
-        for (uint256 i = 0; i < ids.length; ++i) {
-            uint256 id = ids[i];
-            uint256 amount = amounts[i];
+        uint256 id;
+        uint256 amount;
+        uint256 fromBalance;
+        for (uint256 i = 0; i < len;) {
+            id = ids[i];
+            amount = amounts[i];
 
-            uint256 fromBalance = _balances[id][from];
+            fromBalance = _balances[id][from];
             require(fromBalance >= amount, "ERC1155: insufficient balance for transfer");
             unchecked {
                 _balances[id][from] = fromBalance - amount;
             }
             _balances[id][to] += amount;
+            unchecked {
+                ++i;
+            }
         }
 
         emit TransferBatch(operator, from, to, ids, amounts);
@@ -303,14 +314,18 @@ contract ERC1155 is Context, ERC165, IERC1155, IERC1155MetadataURI {
         bytes memory data
     ) internal virtual {
         require(to != address(0), "ERC1155: mint to the zero address");
-        require(ids.length == amounts.length, "ERC1155: ids and amounts length mismatch");
+        uint256 len = ids.length;
+        require(len == amounts.length, "ERC1155: ids and amounts length mismatch");
 
         address operator = _msgSender();
 
         _beforeTokenTransfer(operator, address(0), to, ids, amounts, data);
 
-        for (uint256 i = 0; i < ids.length; i++) {
+        for (uint256 i = 0; i < len;) {
             _balances[ids[i]][to] += amounts[i];
+            unchecked {
+                i++;
+            }
         }
 
         emit TransferBatch(operator, address(0), to, ids, amounts);
@@ -369,20 +384,25 @@ contract ERC1155 is Context, ERC165, IERC1155, IERC1155MetadataURI {
         uint256[] memory amounts
     ) internal virtual {
         require(from != address(0), "ERC1155: burn from the zero address");
-        require(ids.length == amounts.length, "ERC1155: ids and amounts length mismatch");
+        uint256 len = ids.length;
+        require(len == amounts.length, "ERC1155: ids and amounts length mismatch");
 
         address operator = _msgSender();
 
         _beforeTokenTransfer(operator, from, address(0), ids, amounts, "");
 
-        for (uint256 i = 0; i < ids.length; i++) {
-            uint256 id = ids[i];
-            uint256 amount = amounts[i];
+        uint256 id;
+        uint256 amount;
+        uint256 fromBalance;
+        for (uint256 i = 0; i < len;) {
+            id = ids[i];
+            amount = amounts[i];
 
-            uint256 fromBalance = _balances[id][from];
+            fromBalance = _balances[id][from];
             require(fromBalance >= amount, "ERC1155: burn amount exceeds balance");
             unchecked {
                 _balances[id][from] = fromBalance - amount;
+                i++;
             }
         }
 

@@ -179,7 +179,7 @@ abstract contract IGovernor is IERC165 {
     function getVotesWithParams(
         address account,
         uint256 blockNumber,
-        bytes memory params
+        bytes calldata params
     ) public view virtual returns (uint256);
 
     /**
@@ -243,7 +243,7 @@ abstract contract IGovernor is IERC165 {
         uint256 proposalId,
         uint8 support,
         string calldata reason,
-        bytes memory params
+        bytes calldata params
     ) public virtual returns (uint256 balance);
 
     /**
@@ -268,7 +268,7 @@ abstract contract IGovernor is IERC165 {
         uint256 proposalId,
         uint8 support,
         string calldata reason,
-        bytes memory params,
+        bytes calldata params,
         uint8 v,
         bytes32 r,
         bytes32 s

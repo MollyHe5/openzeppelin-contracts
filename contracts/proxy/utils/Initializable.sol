@@ -82,8 +82,9 @@ abstract contract Initializable {
      */
     modifier initializer() {
         bool isTopLevelCall = !_initializing;
+        uint8 initializedLocal = _initialized;
         require(
-            (isTopLevelCall && _initialized < 1) || (!Address.isContract(address(this)) && _initialized == 1),
+            (isTopLevelCall && initializedLocal < 1) || (!Address.isContract(address(this)) && initializedLocal == 1),
             "Initializable: contract is already initialized"
         );
         _initialized = 1;

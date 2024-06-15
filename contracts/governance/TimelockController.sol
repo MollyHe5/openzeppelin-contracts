@@ -94,14 +94,22 @@ contract TimelockController is AccessControl, IERC721Receiver, IERC1155Receiver 
         }
 
         // register proposers and cancellers
-        for (uint256 i = 0; i < proposers.length; ++i) {
+        uint256 proposersLen = proposers.length;
+        for (uint256 i = 0; i < proposersLen;) {
             _setupRole(PROPOSER_ROLE, proposers[i]);
             _setupRole(CANCELLER_ROLE, proposers[i]);
+            unchecked {
+                ++i;
+            }
         }
 
         // register executors
-        for (uint256 i = 0; i < executors.length; ++i) {
+        uint256 executorsLen = executors.length;
+        for (uint256 i = 0; i < executorsLen;) {
             _setupRole(EXECUTOR_ROLE, executors[i]);
+            unchecked {
+                ++i;
+            }
         }
 
         _minDelay = minDelay;
@@ -247,13 +255,17 @@ contract TimelockController is AccessControl, IERC721Receiver, IERC1155Receiver 
         bytes32 salt,
         uint256 delay
     ) public virtual onlyRole(PROPOSER_ROLE) {
-        require(targets.length == values.length, "TimelockController: length mismatch");
-        require(targets.length == payloads.length, "TimelockController: length mismatch");
+        uint256 len = targets.length;
+        require(len == values.length, "TimelockController: length mismatch");
+        require(len == payloads.length, "TimelockController: length mismatch");
 
         bytes32 id = hashOperationBatch(targets, values, payloads, predecessor, salt);
         _schedule(id, delay);
-        for (uint256 i = 0; i < targets.length; ++i) {
+        for (uint256 i = 0; i < len;) {
             emit CallScheduled(id, i, targets[i], values[i], payloads[i], predecessor, delay);
+            unchecked {
+                ++i;
+            }
         }
     }
 
@@ -323,18 +335,25 @@ contract TimelockController is AccessControl, IERC721Receiver, IERC1155Receiver 
         bytes32 predecessor,
         bytes32 salt
     ) public payable virtual onlyRoleOrOpenRole(EXECUTOR_ROLE) {
-        require(targets.length == values.length, "TimelockController: length mismatch");
-        require(targets.length == payloads.length, "TimelockController: length mismatch");
+        uint256 len = targets.length;
+        require(len == values.length, "TimelockController: length mismatch");
+        require(len == payloads.length, "TimelockController: length mismatch");
 
         bytes32 id = hashOperationBatch(targets, values, payloads, predecessor, salt);
 
         _beforeCall(id, predecessor);
-        for (uint256 i = 0; i < targets.length; ++i) {
-            address target = targets[i];
-            uint256 value = values[i];
-            bytes calldata payload = payloads[i];
+        address target;
+        uint256 value;
+        bytes calldata payload;
+        for (uint256 i = 0; i < len;) {
+            target = targets[i];
+            value = values[i];
+            payload = payloads[i];
             _execute(target, value, payload);
             emit CallExecuted(id, i, target, value, payload);
+            unchecked {
+                ++i;
+            }
         }
         _afterCall(id);
     }
@@ -390,7 +409,7 @@ contract TimelockController is AccessControl, IERC721Receiver, IERC1155Receiver 
         address,
         address,
         uint256,
-        bytes memory
+        bytes calldata
     ) public virtual override returns (bytes4) {
         return this.onERC721Received.selector;
     }
@@ -403,7 +422,7 @@ contract TimelockController is AccessControl, IERC721Receiver, IERC1155Receiver 
         address,
         uint256,
         uint256,
-        bytes memory
+        bytes calldata
     ) public virtual override returns (bytes4) {
         return this.onERC1155Received.selector;
     }
@@ -414,9 +433,9 @@ contract TimelockController is AccessControl, IERC721Receiver, IERC1155Receiver 
     function onERC1155BatchReceived(
         address,
         address,
-        uint256[] memory,
-        uint256[] memory,
-        bytes memory
+        uint256[] calldata,
+        uint256[] calldata,
+        bytes calldata
     ) public virtual override returns (bytes4) {
         return this.onERC1155BatchReceived.selector;
     }

@@ -53,14 +53,18 @@ library ERC165Checker {
         view
         returns (bool[] memory)
     {
+        uint256 len = interfaceIds.length;
         // an array of booleans corresponding to interfaceIds and whether they're supported or not
-        bool[] memory interfaceIdsSupported = new bool[](interfaceIds.length);
+        bool[] memory interfaceIdsSupported = new bool[](len);
 
         // query support of ERC165 itself
         if (supportsERC165(account)) {
             // query support of each interface in interfaceIds
-            for (uint256 i = 0; i < interfaceIds.length; i++) {
+            for (uint256 i = 0; i < len;) {
                 interfaceIdsSupported[i] = supportsERC165InterfaceUnchecked(account, interfaceIds[i]);
+                unchecked {
+                    i++;
+                }
             }
         }
 
@@ -82,10 +86,15 @@ library ERC165Checker {
             return false;
         }
 
+        uint256 len = interfaceIds.length;
+
         // query support of each interface in interfaceIds
-        for (uint256 i = 0; i < interfaceIds.length; i++) {
+        for (uint256 i = 0; i < len;) {
             if (!supportsERC165InterfaceUnchecked(account, interfaceIds[i])) {
                 return false;
+            }
+            unchecked {
+                i++;
             }
         }
 

@@ -18,13 +18,13 @@ const argv = require('yargs/yargs')()
     gas: {
       alias: 'enableGasReport',
       type: 'boolean',
-      default: false,
+      default: true,
     },
     gasReport: {
       alias: 'enableGasReportPath',
       type: 'string',
       implies: 'gas',
-      default: undefined,
+      default: "gas-report.txt",
     },
     mode: {
       alias: 'compileMode',

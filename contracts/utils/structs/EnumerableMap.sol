@@ -113,8 +113,8 @@ library EnumerableMap {
      *
      * - `index` must be strictly less than {length}.
      */
-    function at(Bytes32ToBytes32Map storage map, uint256 index) internal view returns (bytes32, bytes32) {
-        bytes32 key = map._keys.at(index);
+    function at(Bytes32ToBytes32Map storage map, uint256 index) internal view returns (bytes32 key, bytes32) {
+        key = map._keys.at(index);
         return (key, map._values[key]);
     }
 
@@ -122,8 +122,8 @@ library EnumerableMap {
      * @dev Tries to returns the value associated with `key`. O(1).
      * Does not revert if `key` is not in the map.
      */
-    function tryGet(Bytes32ToBytes32Map storage map, bytes32 key) internal view returns (bool, bytes32) {
-        bytes32 value = map._values[key];
+    function tryGet(Bytes32ToBytes32Map storage map, bytes32 key) internal view returns (bool, bytes32 value) {
+        value = map._values[key];
         if (value == bytes32(0)) {
             return (contains(map, key), bytes32(0));
         } else {
@@ -138,10 +138,9 @@ library EnumerableMap {
      *
      * - `key` must be in the map.
      */
-    function get(Bytes32ToBytes32Map storage map, bytes32 key) internal view returns (bytes32) {
-        bytes32 value = map._values[key];
+    function get(Bytes32ToBytes32Map storage map, bytes32 key) internal view returns (bytes32 value) {
+        value = map._values[key];
         require(value != 0 || contains(map, key), "EnumerableMap: nonexistent key");
-        return value;
     }
 
     /**
@@ -154,10 +153,9 @@ library EnumerableMap {
         Bytes32ToBytes32Map storage map,
         bytes32 key,
         string memory errorMessage
-    ) internal view returns (bytes32) {
-        bytes32 value = map._values[key];
+    ) internal view returns (bytes32 value) {
+        value = map._values[key];
         require(value != 0 || contains(map, key), errorMessage);
-        return value;
     }
 
     // UintToUintMap

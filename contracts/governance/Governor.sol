@@ -247,13 +247,13 @@ abstract contract Governor is Context, ERC165, EIP712, IGovernor, IERC721Receive
         uint256[] memory values,
         bytes[] memory calldatas,
         string memory description
-    ) public virtual override returns (uint256) {
+    ) public virtual override returns (uint256 proposalId) {
         require(
             getVotes(_msgSender(), block.number - 1) >= proposalThreshold(),
             "Governor: proposer votes below proposal threshold"
         );
 
-        uint256 proposalId = hashProposal(targets, values, calldatas, keccak256(bytes(description)));
+        proposalId = hashProposal(targets, values, calldatas, keccak256(bytes(description)));
 
         require(targets.length == values.length, "Governor: invalid proposal length");
         require(targets.length == calldatas.length, "Governor: invalid proposal length");
@@ -279,8 +279,6 @@ abstract contract Governor is Context, ERC165, EIP712, IGovernor, IERC721Receive
             deadline,
             description
         );
-
-        return proposalId;
     }
 
     /**
@@ -291,8 +289,8 @@ abstract contract Governor is Context, ERC165, EIP712, IGovernor, IERC721Receive
         uint256[] memory values,
         bytes[] memory calldatas,
         bytes32 descriptionHash
-    ) public payable virtual override returns (uint256) {
-        uint256 proposalId = hashProposal(targets, values, calldatas, descriptionHash);
+    ) public payable virtual override returns (uint256 proposalId) {
+        proposalId = hashProposal(targets, values, calldatas, descriptionHash);
 
         ProposalState status = state(proposalId);
         require(
@@ -306,8 +304,6 @@ abstract contract Governor is Context, ERC165, EIP712, IGovernor, IERC721Receive
         _beforeExecute(proposalId, targets, values, calldatas, descriptionHash);
         _execute(proposalId, targets, values, calldatas, descriptionHash);
         _afterExecute(proposalId, targets, values, calldatas, descriptionHash);
-
-        return proposalId;
     }
 
     /**
@@ -384,8 +380,8 @@ abstract contract Governor is Context, ERC165, EIP712, IGovernor, IERC721Receive
         uint256[] memory values,
         bytes[] memory calldatas,
         bytes32 descriptionHash
-    ) internal virtual returns (uint256) {
-        uint256 proposalId = hashProposal(targets, values, calldatas, descriptionHash);
+    ) internal virtual returns (uint256 proposalId) {
+        proposalId = hashProposal(targets, values, calldatas, descriptionHash);
         ProposalState status = state(proposalId);
 
         require(
@@ -395,8 +391,6 @@ abstract contract Governor is Context, ERC165, EIP712, IGovernor, IERC721Receive
         _proposals[proposalId].canceled = true;
 
         emit ProposalCanceled(proposalId);
-
-        return proposalId;
     }
 
     /**
@@ -528,11 +522,11 @@ abstract contract Governor is Context, ERC165, EIP712, IGovernor, IERC721Receive
         uint8 support,
         string memory reason,
         bytes memory params
-    ) internal virtual returns (uint256) {
+    ) internal virtual returns (uint256 weight) {
         ProposalCore storage proposal = _proposals[proposalId];
         require(state(proposalId) == ProposalState.Active, "Governor: vote not currently active");
 
-        uint256 weight = _getVotes(account, proposal.voteStart.getDeadline(), params);
+        weight = _getVotes(account, proposal.voteStart.getDeadline(), params);
         _countVote(proposalId, account, support, weight, params);
 
         if (params.length == 0) {
@@ -540,8 +534,6 @@ abstract contract Governor is Context, ERC165, EIP712, IGovernor, IERC721Receive
         } else {
             emit VoteCastWithParams(account, proposalId, support, weight, reason, params);
         }
-
-        return weight;
     }
 
     /**

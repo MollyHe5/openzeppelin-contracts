@@ -31,10 +31,10 @@ library LibArbitrumL1 {
      * sender, as it will revert with `NotCrossChainCall` if the current
      * function call is not the result of a cross-chain message.
      */
-    function crossChainSender(address bridge) internal view returns (address) {
+    function crossChainSender(address bridge) internal view returns (address sender) {
         if (!isCrossChain(bridge)) revert NotCrossChainCall();
 
-        address sender = ArbitrumL1_Outbox(ArbitrumL1_Bridge(bridge).activeOutbox()).l2ToL1Sender();
+        sender = ArbitrumL1_Outbox(ArbitrumL1_Bridge(bridge).activeOutbox()).l2ToL1Sender();
         require(sender != address(0), "LibArbitrumL1: system messages without sender");
 
         return sender;

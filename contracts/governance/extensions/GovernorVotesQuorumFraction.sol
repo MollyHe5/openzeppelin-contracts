@@ -105,10 +105,12 @@ abstract contract GovernorVotesQuorumFraction is GovernorVotes {
         uint256 oldQuorumNumerator = quorumNumerator();
 
         // Make sure we keep track of the original numerator in contracts upgraded from a version without checkpoints.
-        if (oldQuorumNumerator != 0 && _quorumNumeratorHistory._checkpoints.length == 0) {
-            _quorumNumeratorHistory._checkpoints.push(
-                Checkpoints.Checkpoint({_blockNumber: 0, _value: SafeCast.toUint224(oldQuorumNumerator)})
-            );
+        if (oldQuorumNumerator != 0) {
+            if (_quorumNumeratorHistory._checkpoints.length == 0){
+                _quorumNumeratorHistory._checkpoints.push(
+                    Checkpoints.Checkpoint({_blockNumber: 0, _value: SafeCast.toUint224(oldQuorumNumerator)})
+                );
+            }
         }
 
         // Set new quorum for future proposals

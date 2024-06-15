@@ -53,8 +53,8 @@ library MerkleProof {
      *
      * _Available since v4.4._
      */
-    function processProof(bytes32[] memory proof, bytes32 leaf) internal pure returns (bytes32) {
-        bytes32 computedHash = leaf;
+    function processProof(bytes32[] memory proof, bytes32 leaf) internal pure returns (bytes32 computedHash) {
+        computedHash = leaf;
         uint256 len = proof.length;
         for (uint256 i = 0; i < len;) {
             computedHash = _hashPair(computedHash, proof[i]);
@@ -62,7 +62,6 @@ library MerkleProof {
                 i++;
             }
         }
-        return computedHash;
     }
 
     /**
@@ -70,8 +69,8 @@ library MerkleProof {
      *
      * _Available since v4.7._
      */
-    function processProofCalldata(bytes32[] calldata proof, bytes32 leaf) internal pure returns (bytes32) {
-        bytes32 computedHash = leaf;
+    function processProofCalldata(bytes32[] calldata proof, bytes32 leaf) internal pure returns (bytes32 computedHash) {
+        computedHash = leaf;
         uint256 len = proof.length;
         for (uint256 i = 0; i < len;) {
             computedHash = _hashPair(computedHash, proof[i]);
@@ -79,7 +78,6 @@ library MerkleProof {
                 i++;
             }
         }
-        return computedHash;
     }
 
     /**

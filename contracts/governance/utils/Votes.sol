@@ -158,14 +158,16 @@ abstract contract Votes is IVotes, Context, EIP712 {
         address to,
         uint256 amount
     ) private {
-        if (from != to && amount > 0) {
-            if (from != address(0)) {
-                (uint256 oldValue, uint256 newValue) = _delegateCheckpoints[from].push(_subtract, amount);
-                emit DelegateVotesChanged(from, oldValue, newValue);
-            }
-            if (to != address(0)) {
-                (uint256 oldValue, uint256 newValue) = _delegateCheckpoints[to].push(_add, amount);
-                emit DelegateVotesChanged(to, oldValue, newValue);
+        if (from != to) {
+            if (amount > 0) {
+                if (from != address(0)) {
+                    (uint256 oldValue, uint256 newValue) = _delegateCheckpoints[from].push(_subtract, amount);
+                    emit DelegateVotesChanged(from, oldValue, newValue);
+                }
+                if (to != address(0)) {
+                    (uint256 oldValue, uint256 newValue) = _delegateCheckpoints[to].push(_add, amount);
+                    emit DelegateVotesChanged(to, oldValue, newValue);
+                }
             }
         }
     }

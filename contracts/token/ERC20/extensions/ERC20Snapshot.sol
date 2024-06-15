@@ -85,12 +85,11 @@ abstract contract ERC20Snapshot is ERC20 {
      * We haven't measured the actual numbers; if this is something you're interested in please reach out to us.
      * ====
      */
-    function _snapshot() internal virtual returns (uint256) {
+    function _snapshot() internal virtual returns (uint256 currentId) {
         _currentSnapshotId.increment();
 
-        uint256 currentId = _getCurrentSnapshotId();
+        currentId = _getCurrentSnapshotId();
         emit Snapshot(currentId);
-        return currentId;
     }
 
     /**

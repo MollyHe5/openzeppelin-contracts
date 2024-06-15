@@ -134,7 +134,7 @@ library ECDSA {
         uint8 v,
         bytes32 r,
         bytes32 s
-    ) internal pure returns (address, RecoverError) {
+    ) internal pure returns (address signer, RecoverError) {
         // EIP-2 still allows signature malleability for ecrecover(). Remove this possibility and make the signature
         // unique. Appendix F in the Ethereum Yellow paper (https://ethereum.github.io/yellowpaper/paper.pdf), defines
         // the valid range for s in (301): 0 < s < secp256k1n ÷ 2 + 1, and for v in (302): v ∈ {27, 28}. Most
@@ -149,7 +149,7 @@ library ECDSA {
         }
 
         // If the signature is valid (and not malleable), return the signer address
-        address signer = ecrecover(hash, v, r, s);
+        signer = ecrecover(hash, v, r, s);
         if (signer == address(0)) {
             return (address(0), RecoverError.InvalidSignature);
         }

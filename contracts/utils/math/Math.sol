@@ -142,12 +142,13 @@ library Math {
         uint256 y,
         uint256 denominator,
         Rounding rounding
-    ) internal pure returns (uint256) {
-        uint256 result = mulDiv(x, y, denominator);
-        if (rounding == Rounding.Up && mulmod(x, y, denominator) > 0) {
-            result += 1;
+    ) internal pure returns (uint256 result) {
+        result = mulDiv(x, y, denominator);
+        if (rounding == Rounding.Up) {
+            if (mulmod(x, y, denominator) > 0) {
+                result += 1;
+            }
         }
-        return result;
     }
 
     /**
@@ -202,8 +203,8 @@ library Math {
      * @dev Return the log in base 2, rounded down, of a positive value.
      * Returns 0 if given 0.
      */
-    function log2(uint256 value) internal pure returns (uint256) {
-        uint256 result = 0;
+    function log2(uint256 value) internal pure returns (uint256 result) {
+        result = 0;
         unchecked {
             if (value >> 128 > 0) {
                 value >>= 128;
@@ -237,7 +238,6 @@ library Math {
                 result += 1;
             }
         }
-        return result;
     }
 
     /**
@@ -255,8 +255,8 @@ library Math {
      * @dev Return the log in base 10, rounded down, of a positive value.
      * Returns 0 if given 0.
      */
-    function log10(uint256 value) internal pure returns (uint256) {
-        uint256 result = 0;
+    function log10(uint256 value) internal pure returns (uint256 result) {
+        result = 0;
         unchecked {
             if (value >= 10**64) {
                 value /= 10**64;
@@ -286,7 +286,6 @@ library Math {
                 result += 1;
             }
         }
-        return result;
     }
 
     /**
@@ -306,8 +305,8 @@ library Math {
      *
      * Adding one to the result gives the number of pairs of hex symbols needed to represent `value` as a hex string.
      */
-    function log256(uint256 value) internal pure returns (uint256) {
-        uint256 result = 0;
+    function log256(uint256 value) internal pure returns (uint256 result) {
+        result = 0;
         unchecked {
             if (value >> 128 > 0) {
                 value >>= 128;
@@ -329,7 +328,6 @@ library Math {
                 result += 1;
             }
         }
-        return result;
     }
 
     /**

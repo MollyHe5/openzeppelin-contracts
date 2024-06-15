@@ -93,8 +93,8 @@ abstract contract GovernorTimelockCompound is IGovernorTimelock, Governor {
         uint256[] memory values,
         bytes[] memory calldatas,
         bytes32 descriptionHash
-    ) public virtual override returns (uint256) {
-        uint256 proposalId = hashProposal(targets, values, calldatas, descriptionHash);
+    ) public virtual override returns (uint256 proposalId) {
+        proposalId = hashProposal(targets, values, calldatas, descriptionHash);
 
         require(state(proposalId) == ProposalState.Succeeded, "Governor: proposal not successful");
 
@@ -113,8 +113,6 @@ abstract contract GovernorTimelockCompound is IGovernorTimelock, Governor {
         }
 
         emit ProposalQueued(proposalId, eta);
-
-        return proposalId;
     }
 
     /**
@@ -148,8 +146,8 @@ abstract contract GovernorTimelockCompound is IGovernorTimelock, Governor {
         uint256[] memory values,
         bytes[] memory calldatas,
         bytes32 descriptionHash
-    ) internal virtual override returns (uint256) {
-        uint256 proposalId = super._cancel(targets, values, calldatas, descriptionHash);
+    ) internal virtual override returns (uint256 proposalId) {
+        proposalId = super._cancel(targets, values, calldatas, descriptionHash);
 
         uint256 eta = proposalEta(proposalId);
         if (eta > 0) {
@@ -162,8 +160,6 @@ abstract contract GovernorTimelockCompound is IGovernorTimelock, Governor {
             }
             _proposalTimelocks[proposalId].timer.reset();
         }
-
-        return proposalId;
     }
 
     /**

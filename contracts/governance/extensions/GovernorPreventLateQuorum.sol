@@ -59,22 +59,22 @@ abstract contract GovernorPreventLateQuorum is Governor {
         uint8 support,
         string memory reason,
         bytes memory params
-    ) internal virtual override returns (uint256) {
-        uint256 result = super._castVote(proposalId, account, support, reason, params);
+    ) internal virtual override returns (uint256 result) {
+        result = super._castVote(proposalId, account, support, reason, params);
 
         Timers.BlockNumber storage extendedDeadline = _extendedDeadlines[proposalId];
 
-        if (extendedDeadline.isUnset() && _quorumReached(proposalId)) {
-            uint64 extendedDeadlineValue = block.number.toUint64() + lateQuorumVoteExtension();
+        if (extendedDeadline.isUnset()) {
+            if (_quorumReached(proposalId)) {
+                uint64 extendedDeadlineValue = block.number.toUint64() + lateQuorumVoteExtension();
 
-            if (extendedDeadlineValue > proposalDeadline(proposalId)) {
-                emit ProposalExtended(proposalId, extendedDeadlineValue);
+                if (extendedDeadlineValue > proposalDeadline(proposalId)) {
+                    emit ProposalExtended(proposalId, extendedDeadlineValue);
+                }
+
+                extendedDeadline.setDeadline(extendedDeadlineValue);
             }
-
-            extendedDeadline.setDeadline(extendedDeadlineValue);
         }
-
-        return result;
     }
 
     /**

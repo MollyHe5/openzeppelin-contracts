@@ -17,7 +17,7 @@ library Base64 {
     /**
      * @dev Converts a `bytes` to its Bytes64 `string` representation.
      */
-    function encode(bytes memory data) internal pure returns (string memory) {
+    function encode(bytes memory data) internal pure returns (string memory result) {
         /**
          * Inspired by Brecht Devos (Brechtpd) implementation - MIT licence
          * https://github.com/Brechtpd/base64/blob/e78d9fd951e7b0977ddca77d92dc85183770daf4/base64.sol
@@ -33,7 +33,7 @@ library Base64 {
         // - `data.length + 2`  -> Round up
         // - `/ 3`              -> Number of 3-bytes chunks
         // - `4 *`              -> 4 characters for each chunk
-        string memory result = new string(4 * ((data.length + 2) / 3));
+        result = new string(4 * ((data.length + 2) / 3));
 
         /// @solidity memory-safe-assembly
         assembly {
@@ -86,7 +86,5 @@ library Base64 {
                 mstore8(sub(resultPtr, 1), 0x3d)
             }
         }
-
-        return result;
     }
 }

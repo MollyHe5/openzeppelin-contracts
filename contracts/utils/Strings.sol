@@ -15,10 +15,10 @@ library Strings {
     /**
      * @dev Converts a `uint256` to its ASCII `string` decimal representation.
      */
-    function toString(uint256 value) internal pure returns (string memory) {
+    function toString(uint256 value) internal pure returns (string memory buffer) {
         unchecked {
             uint256 length = Math.log10(value) + 1;
-            string memory buffer = new string(length);
+            buffer = new string(length);
             uint256 ptr;
             /// @solidity memory-safe-assembly
             assembly {

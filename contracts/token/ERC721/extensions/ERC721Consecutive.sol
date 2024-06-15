@@ -51,8 +51,8 @@ abstract contract ERC721Consecutive is IERC2309, ERC721 {
      * @dev See {ERC721-_ownerOf}. Override that checks the sequential ownership structure for tokens that have
      * been minted as part of a batch, and not yet transferred.
      */
-    function _ownerOf(uint256 tokenId) internal view virtual override returns (address) {
-        address owner = super._ownerOf(tokenId);
+    function _ownerOf(uint256 tokenId) internal view virtual override returns (address owner) {
+        owner = super._ownerOf(tokenId);
 
         // If token is owned by the core, or beyond consecutive range, return base value
         if (owner != address(0) || tokenId > type(uint96).max) {
@@ -80,8 +80,8 @@ abstract contract ERC721Consecutive is IERC2309, ERC721 {
      *
      * Emits a {IERC2309-ConsecutiveTransfer} event.
      */
-    function _mintConsecutive(address to, uint96 batchSize) internal virtual returns (uint96) {
-        uint96 first = _totalConsecutiveSupply();
+    function _mintConsecutive(address to, uint96 batchSize) internal virtual returns (uint96 first) {
+        first = _totalConsecutiveSupply();
 
         // minting a batch of size 0 is a no-op
         if (batchSize > 0) {
@@ -100,8 +100,6 @@ abstract contract ERC721Consecutive is IERC2309, ERC721 {
             // hook after
             _afterTokenTransfer(address(0), to, first, batchSize);
         }
-
-        return first;
     }
 
     /**
@@ -124,13 +122,13 @@ abstract contract ERC721Consecutive is IERC2309, ERC721 {
         uint256 firstTokenId,
         uint256 batchSize
     ) internal virtual override {
-        if (
-            to == address(0) && // if we burn
-            firstTokenId < _totalConsecutiveSupply() && // and the tokenId was minted in a batch
-            !_sequentialBurn.get(firstTokenId) // and the token was never marked as burnt
-        ) {
-            require(batchSize == 1, "ERC721Consecutive: batch burn not supported");
-            _sequentialBurn.set(firstTokenId);
+        if (to == address(0)) { // if we burn
+            if (firstTokenId < _totalConsecutiveSupply()){ // and the tokenId was minted in a batch
+                if(!_sequentialBurn.get(firstTokenId)){ // and the token was never marked as burnt
+                    require(batchSize == 1, "ERC721Consecutive: batch burn not supported");
+                    _sequentialBurn.set(firstTokenId);
+                }
+            }
         }
         super._afterTokenTransfer(from, to, firstTokenId, batchSize);
     }

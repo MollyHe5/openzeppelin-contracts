@@ -45,10 +45,12 @@ abstract contract ERC4626 is ERC20, IERC4626 {
         (bool success, bytes memory encodedDecimals) = address(asset_).call(
             abi.encodeWithSelector(IERC20Metadata.decimals.selector)
         );
-        if (success && encodedDecimals.length >= 32) {
-            uint256 returnedDecimals = abi.decode(encodedDecimals, (uint256));
-            if (returnedDecimals <= type(uint8).max) {
-                return (true, uint8(returnedDecimals));
+        if (success) {
+            if (encodedDecimals.length >= 32) {
+                uint256 returnedDecimals = abi.decode(encodedDecimals, (uint256));
+                if (returnedDecimals <= type(uint8).max) {
+                    return (true, uint8(returnedDecimals));
+                }
             }
         }
         return (false, 0);
@@ -125,23 +127,19 @@ abstract contract ERC4626 is ERC20, IERC4626 {
     }
 
     /** @dev See {IERC4626-deposit}. */
-    function deposit(uint256 assets, address receiver) public virtual override returns (uint256) {
+    function deposit(uint256 assets, address receiver) public virtual override returns (uint256 shares) {
         require(assets <= maxDeposit(receiver), "ERC4626: deposit more than max");
 
-        uint256 shares = previewDeposit(assets);
+        shares = previewDeposit(assets);
         _deposit(_msgSender(), receiver, assets, shares);
-
-        return shares;
     }
 
     /** @dev See {IERC4626-mint}. */
-    function mint(uint256 shares, address receiver) public virtual override returns (uint256) {
+    function mint(uint256 shares, address receiver) public virtual override returns (uint256 assets) {
         require(shares <= maxMint(receiver), "ERC4626: mint more than max");
 
-        uint256 assets = previewMint(shares);
+        assets = previewMint(shares);
         _deposit(_msgSender(), receiver, assets, shares);
-
-        return assets;
     }
 
     /** @dev See {IERC4626-withdraw}. */
@@ -149,13 +147,11 @@ abstract contract ERC4626 is ERC20, IERC4626 {
         uint256 assets,
         address receiver,
         address owner
-    ) public virtual override returns (uint256) {
+    ) public virtual override returns (uint256 shares) {
         require(assets <= maxWithdraw(owner), "ERC4626: withdraw more than max");
 
-        uint256 shares = previewWithdraw(assets);
+        shares = previewWithdraw(assets);
         _withdraw(_msgSender(), receiver, owner, assets, shares);
-
-        return shares;
     }
 
     /** @dev See {IERC4626-redeem}. */
@@ -163,13 +159,11 @@ abstract contract ERC4626 is ERC20, IERC4626 {
         uint256 shares,
         address receiver,
         address owner
-    ) public virtual override returns (uint256) {
+    ) public virtual override returns (uint256 assets) {
         require(shares <= maxRedeem(owner), "ERC4626: redeem more than max");
 
-        uint256 assets = previewRedeem(shares);
+        assets = previewRedeem(shares);
         _withdraw(_msgSender(), receiver, owner, assets, shares);
-
-        return assets;
     }
 
     /**

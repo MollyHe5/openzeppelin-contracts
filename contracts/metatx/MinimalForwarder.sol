@@ -47,12 +47,12 @@ contract MinimalForwarder is EIP712 {
     function execute(ForwardRequest calldata req, bytes calldata signature)
         public
         payable
-        returns (bool, bytes memory)
+        returns (bool success, bytes memory returndata)
     {
         require(verify(req, signature), "MinimalForwarder: signature does not match request");
         _nonces[req.from] = req.nonce + 1;
 
-        (bool success, bytes memory returndata) = req.to.call{gas: req.gas, value: req.value}(
+        (success, returndata) = req.to.call{gas: req.gas, value: req.value}(
             abi.encodePacked(req.data, req.from)
         );
 
@@ -67,7 +67,5 @@ contract MinimalForwarder is EIP712 {
                 invalid()
             }
         }
-
-        return (success, returndata);
     }
 }
